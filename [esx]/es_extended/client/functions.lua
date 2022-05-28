@@ -412,7 +412,7 @@ function ESX.Game.DeleteObject(object)
 	DeleteObject(object)
 end
 
-function ESX.Game.SpawnVehicle(vehicle, coords, heading, cb, networked)
+ESX.Game.TempSpawnVehicle(vehicle, coords, heading, cb, networked)
 	local model = (type(vehicle) == 'number' and vehicle or GetHashKey(vehicle))
 	local vector = type(coords) == "vector3" and coords or vec(coords.x, coords.y, coords.z)
 	networked = networked == nil and true or networked
@@ -435,6 +435,16 @@ function ESX.Game.SpawnVehicle(vehicle, coords, heading, cb, networked)
 		while not HasCollisionLoadedAroundEntity(vehicle) do
 			Wait(0)
 		end
+
+		if cb then
+			cb(vehicle)
+		end
+	end)
+end
+
+function ESX.Game.SpawnVehicle(vehicle, coords, heading, cb, networked)
+	ESX.Game.TempSpawnVehicle(modelName, coords, heading, function(vehicle)
+		TriggerEvent('persistent-vehicles/register-vehicle', vehicle)
 
 		if cb then
 			cb(vehicle)
